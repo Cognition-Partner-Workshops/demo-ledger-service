@@ -2,8 +2,13 @@ from datetime import date
 
 import pytest
 
-from ledger.markets import UnknownMarketError
-from ledger.settlement import HolidayCalendarCoverageError, is_settled, settlement_date
+from ledger.markets import MARKETS, UnknownMarketError
+from ledger.settlement import (
+    CALENDAR_YEARS,
+    HolidayCalendarCoverageError,
+    is_settled,
+    settlement_date,
+)
 
 
 def test_settlement_t_plus_one_us_equity():
@@ -71,6 +76,13 @@ def test_settlement_beyond_calendar_coverage_error_is_descriptive():
 def test_coverage_error_is_a_value_error():
     with pytest.raises(ValueError):
         settlement_date(date(2027, 6, 1), "XLON")
+
+
+@pytest.mark.parametrize("market_code", sorted(MARKETS))
+def test_every_covered_year_has_holidays_for_market(market_code):
+    # CALENDAR_YEARS must only name years whose schedule is actually present.
+    holiday_years = {holiday.year for holiday in MARKETS[market_code].holidays}
+    assert CALENDAR_YEARS <= holiday_years
 
 
 def test_is_settled_beyond_calendar_coverage_raises():

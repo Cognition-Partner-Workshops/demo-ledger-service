@@ -48,9 +48,10 @@ section disagree, this section is right.
   one business day later than it otherwise would.
 - The trade date itself is never rolled: a trade dated on a weekend or holiday
   counts its N business days forward from that date.
-- Each holiday calendar only covers the years it lists holidays for (currently
-  2026). Counting through a date outside that coverage raises
-  `HolidayCalendarCoverageError` instead of treating the day as open.
+- The holiday calendars are complete only for the years in
+  `ledger/settlement.py::CALENDAR_YEARS` (currently 2026). Counting through a
+  date outside those years raises `HolidayCalendarCoverageError` instead of
+  treating the day as open.
 
 ### Money and rounding
 
