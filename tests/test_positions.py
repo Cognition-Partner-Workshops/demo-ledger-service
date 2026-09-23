@@ -55,6 +55,26 @@ def test_sell_exceeding_position_raises():
         build_positions(trades)
 
 
+def test_oversell_after_partial_sells_raises():
+    trades = [
+        trade("T1", Side.BUY, "100", "10.00", date(2026, 3, 2)),
+        trade("T2", Side.SELL, "60", "11.00", date(2026, 3, 3)),
+        trade("T3", Side.SELL, "30", "11.00", date(2026, 3, 4)),
+        trade("T4", Side.SELL, "11", "11.00", date(2026, 3, 5)),
+    ]
+    with pytest.raises(ValueError, match=r"T4: sell of 11 exceeds position 10"):
+        build_positions(trades)
+
+
+def test_sell_with_no_holdings_raises():
+    trades = [
+        trade("T1", Side.BUY, "10", "5", date(2026, 3, 2), symbol="ABC"),
+        trade("T2", Side.SELL, "1", "5", date(2026, 3, 3), symbol="XYZ"),
+    ]
+    with pytest.raises(ValueError, match=r"T2: sell of 1 exceeds position 0"):
+        build_positions(trades)
+
+
 def test_gross_exposure_and_account_filter():
     positions = build_positions(
         [
