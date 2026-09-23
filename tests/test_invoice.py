@@ -7,6 +7,7 @@ import pytest
 
 from ledger.fees import management_fee, performance_fee
 from ledger.invoice import Invoice, render_invoice
+from ledger.models import InvoiceLine
 
 FIXTURES = Path(__file__).parent / "fixtures" / "invoices.json"
 
@@ -57,6 +58,19 @@ def test_tax_rounds_to_cent():
     assert invoice.subtotal() * invoice.tax_rate == Decimal("158.18500")
     assert invoice.tax() == Decimal("158.19")
     assert invoice.total() == Decimal("1423.67")
+
+
+def test_constructor_lines_are_rounded():
+    invoice = Invoice(
+        invoice_id="INV-X",
+        account="ACC-X",
+        period_start=date(2026, 1, 1),
+        period_end=date(2026, 3, 31),
+        lines=[InvoiceLine("Fee", Decimal("1.001"))],
+    )
+    assert invoice.lines[0].amount == Decimal("1.01")
+    assert invoice.subtotal() == Decimal("1.01")
+    assert render_invoice(invoice).splitlines()[4].endswith("1.01")
 
 
 def test_render_invoice_layout():

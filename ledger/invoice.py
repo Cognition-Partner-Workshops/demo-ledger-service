@@ -19,6 +19,12 @@ class Invoice:
     tax_rate: Decimal = Decimal("0")
     lines: list[InvoiceLine] = field(default_factory=list)
 
+    def __post_init__(self) -> None:
+        self.lines = [
+            InvoiceLine(description=line.description, amount=round_money(line.amount))
+            for line in self.lines
+        ]
+
     def add_line(self, description: str, amount: Decimal) -> None:
         self.lines.append(InvoiceLine(description=description, amount=round_money(amount)))
 
