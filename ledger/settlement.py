@@ -3,13 +3,37 @@
 Each market settles a fixed number of business days after trade date
 (T+1 for US equities, T+2 for most others). Business days exclude weekends
 and the market's exchange holidays.
+
+The holiday calendars in ``ledger.markets`` are complete only for the years
+in ``CALENDAR_YEARS``. Counting business days through a date outside those
+years raises ``HolidayCalendarCoverageError`` rather than treating the date
+as open. Extend ``CALENDAR_YEARS`` only after every market's full holiday
+schedule for the new year has been added to ``ledger.markets``.
 """
 
 from __future__ import annotations
 
 from datetime import date, timedelta
 
-from ledger.markets import Market, get_market, is_weekend
+from ledger.markets import Market, get_market, is_business_day
+
+CALENDAR_YEARS: frozenset[int] = frozenset({2026})
+
+
+class HolidayCalendarCoverageError(ValueError):
+    def __init__(self, day: date, market: Market) -> None:
+        years = ", ".join(str(y) for y in sorted(CALENDAR_YEARS))
+        super().__init__(
+            f"{market.code} holiday calendar covers {years}; "
+            f"cannot classify {day.isoformat()} as a business day"
+        )
+        self.day = day
+        self.market = market
+
+
+def _check_coverage(day: date, market: Market) -> None:
+    if day.year not in CALENDAR_YEARS:
+        raise HolidayCalendarCoverageError(day, market)
 
 
 def add_business_days(start: date, days: int, market: Market) -> date:
@@ -19,7 +43,8 @@ def add_business_days(start: date, days: int, market: Market) -> date:
     remaining = days
     while remaining > 0:
         current += timedelta(days=1)
-        if is_weekend(current):
+        _check_coverage(current, market)
+        if not is_business_day(current, market):
             continue
         remaining -= 1
     return current

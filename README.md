@@ -46,6 +46,12 @@ section disagree, this section is right.
 - Business days exclude Saturdays, Sundays and the market's exchange holidays
   listed in `ledger/markets.py`. A trade on the day before a holiday settles
   one business day later than it otherwise would.
+- The trade date itself is never rolled: a trade dated on a weekend or holiday
+  counts its N business days forward from that date.
+- The holiday calendars are complete only for the years in
+  `ledger/settlement.py::CALENDAR_YEARS` (currently 2026). Counting through a
+  date outside those years raises `HolidayCalendarCoverageError` instead of
+  treating the day as open.
 
 ### Money and rounding
 
