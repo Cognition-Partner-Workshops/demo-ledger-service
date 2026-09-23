@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from ledger.invoice import Invoice, render_invoice
+from ledger.models import InvoiceLine
 
 FIXTURES = Path(__file__).parent / "fixtures" / "invoices.json"
 
@@ -50,6 +51,17 @@ def test_all_fixture_totals_round_half_up(invoice_id):
     assert invoice.subtotal() == Decimal(fixture["subtotal"])
     assert invoice.tax() == Decimal(fixture["tax"])
     assert invoice.total() == Decimal(fixture["total"])
+
+
+def test_sub_cent_lines_render_and_total_consistently():
+    invoice = Invoice("INV-X", "ACC-X", date(2026, 1, 1), date(2026, 3, 31))
+    invoice.lines.append(InvoiceLine("A", Decimal("1.004")))
+    invoice.lines.append(InvoiceLine("B", Decimal("2.005")))
+    rendered = render_invoice(invoice).splitlines()
+    assert rendered[4].endswith("1.00")
+    assert rendered[5].endswith("2.01")
+    assert invoice.subtotal() == Decimal("3.01")
+    assert invoice.total() == Decimal("3.01")
 
 
 def test_render_invoice_layout():
