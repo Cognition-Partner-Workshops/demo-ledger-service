@@ -3,7 +3,7 @@ from datetime import date
 import pytest
 
 from ledger.markets import UnknownMarketError
-from ledger.settlement import is_settled, settlement_date
+from ledger.settlement import CalendarCoverageError, is_settled, settlement_date
 
 
 def test_settlement_t_plus_one_us_equity():
@@ -32,3 +32,44 @@ def test_is_settled_on_and_after_settlement_date():
 def test_unknown_market_raises():
     with pytest.raises(UnknownMarketError):
         settlement_date(date(2026, 3, 6), "XXXX")
+
+
+def test_settlement_skips_consecutive_holidays():
+    # Thursday 2 Apr 2026 in London. Good Friday (3 Apr) and Easter Monday
+    # (6 Apr) are both closed, so T+2 is Wednesday 8 Apr.
+    assert settlement_date(date(2026, 4, 2), "XLON") == date(2026, 4, 8)
+
+
+def test_trade_dated_on_weekend_is_not_rolled():
+    # Saturday 7 Mar 2026 in New York. Counting starts from the trade date
+    # as given: Sunday is skipped, so T+1 is Monday 9 Mar.
+    assert settlement_date(date(2026, 3, 7), "XNYS") == date(2026, 3, 9)
+
+
+def test_trade_dated_on_holiday_is_not_rolled():
+    # Trade dated on the London Summer bank holiday, Monday 31 Aug 2026.
+    # T+2 counts Tue 1 Sep and Wed 2 Sep.
+    assert settlement_date(date(2026, 8, 31), "XLON") == date(2026, 9, 2)
+
+
+def test_settlement_crossing_out_of_calendar_coverage_raises():
+    # Wednesday 30 Dec 2026 in London. T+2 would need to know whether
+    # 1 Jan 2027 is open, and the calendar only covers 2026.
+    with pytest.raises(CalendarCoverageError, match=r"XLON.*2027-01-01"):
+        settlement_date(date(2026, 12, 30), "XLON")
+
+
+def test_settlement_entirely_outside_calendar_coverage_raises():
+    with pytest.raises(CalendarCoverageError, match=r"XNYS.*2030-06-04"):
+        settlement_date(date(2030, 6, 3), "XNYS")
+
+
+def test_is_settled_outside_calendar_coverage_raises():
+    with pytest.raises(CalendarCoverageError):
+        is_settled(date(2027, 3, 1), "XETR", date(2027, 3, 10))
+
+
+def test_trade_date_outside_coverage_is_fine_when_counted_days_are_covered():
+    # Only the days counted after the trade date need calendar data.
+    # Wed 31 Dec 2025 in New York: T+1 skips New Year's Day, Fri 2 Jan 2026.
+    assert settlement_date(date(2025, 12, 31), "XNYS") == date(2026, 1, 2)
