@@ -7,6 +7,7 @@ from datetime import date
 from decimal import Decimal
 
 from ledger.models import InvoiceLine
+from ledger.money import round_cents
 
 
 @dataclass
@@ -19,20 +20,20 @@ class Invoice:
     lines: list[InvoiceLine] = field(default_factory=list)
 
     def add_line(self, description: str, amount: Decimal) -> None:
-        self.lines.append(InvoiceLine(description=description, amount=amount))
+        self.lines.append(InvoiceLine(description=description, amount=round_cents(amount)))
 
     def subtotal(self) -> Decimal:
-        return sum((line.amount for line in self.lines), Decimal("0"))
+        return sum((round_cents(line.amount) for line in self.lines), Decimal("0.00"))
 
     def tax(self) -> Decimal:
-        return self.subtotal() * self.tax_rate
+        return round_cents(self.subtotal() * self.tax_rate)
 
     def total(self) -> Decimal:
         return self.subtotal() + self.tax()
 
 
 def _money(value: Decimal) -> str:
-    return f"{value:,.2f}"
+    return f"{round_cents(value):,.2f}"
 
 
 def render_invoice(invoice: Invoice) -> str:

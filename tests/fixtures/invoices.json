@@ -21,12 +21,12 @@
       "period_end": "2026-03-31",
       "tax_rate": "0.125",
       "lines": [
-        {"description": "Management fee Q1 2026", "notional": "12345.00", "bps": "25", "amount": "30.87"},
+        {"description": "Management fee Q1 2026", "notional": "12345.00", "bps": "25", "amount": "30.86"},
         {"description": "Performance fee Q1 2026", "gain": "6173.025", "rate": "0.20", "amount": "1234.61"}
       ],
-      "subtotal": "1265.48",
-      "tax": "158.19",
-      "total": "1423.67"
+      "subtotal": "1265.47",
+      "tax": "158.18",
+      "total": "1423.65"
     },
     {
       "invoice_id": "INV-2026-0003",
@@ -35,11 +35,11 @@
       "period_end": "2026-03-31",
       "tax_rate": "0",
       "lines": [
-        {"description": "Management fee Q1 2026", "notional": "54321.00", "bps": "15", "amount": "81.49"}
+        {"description": "Management fee Q1 2026", "notional": "54321.00", "bps": "15", "amount": "81.48"}
       ],
-      "subtotal": "81.49",
+      "subtotal": "81.48",
       "tax": "0.00",
-      "total": "81.49"
+      "total": "81.48"
     }
   ]
 }

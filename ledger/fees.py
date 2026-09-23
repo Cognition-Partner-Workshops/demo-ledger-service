@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-CENT = Decimal("0.01")
+from ledger.money import round_cents
+
 BPS = Decimal("10000")
 
 
@@ -12,8 +13,7 @@ def management_fee(notional: Decimal, bps: Decimal) -> Decimal:
     """Flat management fee on a notional, quoted in basis points."""
     if notional < 0:
         raise ValueError("notional must be non-negative")
-    fee = notional * bps / BPS
-    return fee.quantize(CENT)
+    return round_cents(notional * bps / BPS)
 
 
 def performance_fee(gain: Decimal, rate: Decimal, hurdle: Decimal = Decimal("0")) -> Decimal:
@@ -21,7 +21,7 @@ def performance_fee(gain: Decimal, rate: Decimal, hurdle: Decimal = Decimal("0")
     excess = gain - hurdle
     if excess <= 0:
         return Decimal("0.00")
-    return (excess * rate).quantize(CENT)
+    return round_cents(excess * rate)
 
 
 def tiered_management_fee(notional: Decimal, tiers: list[tuple[Decimal, Decimal]]) -> Decimal:
@@ -40,4 +40,4 @@ def tiered_management_fee(notional: Decimal, tiers: list[tuple[Decimal, Decimal]
         total += band * bps / BPS
         remaining -= band
         lower = upper
-    return total.quantize(CENT)
+    return round_cents(total)

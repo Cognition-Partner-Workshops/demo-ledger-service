@@ -6,6 +6,8 @@ from datetime import date
 from decimal import Decimal
 from enum import Enum
 
+from ledger.money import round_cents
+
 
 class DayCount(str, Enum):
     ACT_360 = "ACT/360"
@@ -37,6 +39,4 @@ def year_fraction(start: date, end: date, convention: DayCount) -> Decimal:
 def accrued_interest(
     principal: Decimal, annual_rate: Decimal, start: date, end: date, convention: DayCount
 ) -> Decimal:
-    return (principal * annual_rate * year_fraction(start, end, convention)).quantize(
-        Decimal("0.01")
-    )
+    return round_cents(principal * annual_rate * year_fraction(start, end, convention))
