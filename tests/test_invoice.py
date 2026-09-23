@@ -34,6 +34,14 @@ def test_invoice_totals_match_fixture():
     assert invoice.total() == Decimal(fixture["total"])
 
 
+def test_invoice_tax_rounds_half_cent_up():
+    fixture = load_fixture("INV-2026-0002")
+    invoice = build_invoice(fixture)
+    # 1265.48 * 0.125 = 158.185 -> 158.19
+    assert invoice.tax() == Decimal(fixture["tax"])
+    assert invoice.total() == Decimal(fixture["total"])
+
+
 def test_render_invoice_layout():
     invoice = build_invoice(load_fixture("INV-2026-0001"))
     text = render_invoice(invoice)
