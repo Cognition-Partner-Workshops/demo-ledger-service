@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from ledger.markets import UnknownMarketError
+from ledger.markets import CalendarCoverageError, UnknownMarketError
 from ledger.settlement import is_settled, settlement_date
 
 
@@ -32,3 +32,15 @@ def test_is_settled_on_and_after_settlement_date():
 def test_unknown_market_raises():
     with pytest.raises(UnknownMarketError):
         settlement_date(date(2026, 3, 6), "XXXX")
+
+
+def test_settlement_rejects_dates_outside_calendar_coverage():
+    # Thursday 31 Dec 2026 in New York: T+1 would land on 1 Jan 2027, which
+    # the holiday calendar does not cover.
+    with pytest.raises(CalendarCoverageError):
+        settlement_date(date(2026, 12, 31), "XNYS")
+
+
+def test_settlement_rejects_trade_date_outside_calendar_coverage():
+    with pytest.raises(CalendarCoverageError):
+        settlement_date(date(2025, 12, 30), "XLON")
