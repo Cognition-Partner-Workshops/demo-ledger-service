@@ -5,6 +5,7 @@ from pathlib import Path
 
 from ledger.fees import management_fee, performance_fee
 from ledger.invoice import Invoice, render_invoice
+from ledger.models import InvoiceLine
 
 FIXTURES = Path(__file__).parent / "fixtures" / "invoices.json"
 
@@ -52,6 +53,20 @@ def test_invoice_with_tax_rounds_half_up():
     # 1265.47 * 0.125 = 158.18375 -> 158.18
     assert invoice.tax() == Decimal(fixture["tax"])
     assert invoice.total() == Decimal(fixture["total"])
+
+
+def test_preloaded_lines_round_half_up_consistently():
+    invoice = Invoice(
+        invoice_id="INV-X",
+        account="ACC-X",
+        period_start=date(2026, 1, 1),
+        period_end=date(2026, 3, 31),
+        lines=[InvoiceLine("Fee", Decimal("1.005"))],
+    )
+    assert invoice.subtotal() == Decimal("1.01")
+    lines = render_invoice(invoice).splitlines()
+    assert lines[4].endswith("1.01")
+    assert lines[-1].endswith("1.01")
 
 
 def test_render_invoice_layout():

@@ -23,7 +23,7 @@ class Invoice:
         self.lines.append(InvoiceLine(description=description, amount=round_cents(amount)))
 
     def subtotal(self) -> Decimal:
-        return round_cents(sum((line.amount for line in self.lines), Decimal("0")))
+        return sum((round_cents(line.amount) for line in self.lines), Decimal("0.00"))
 
     def tax(self) -> Decimal:
         return round_cents(self.subtotal() * self.tax_rate)
@@ -33,7 +33,7 @@ class Invoice:
 
 
 def _money(value: Decimal) -> str:
-    return f"{value:,.2f}"
+    return f"{round_cents(value):,.2f}"
 
 
 def render_invoice(invoice: Invoice) -> str:
