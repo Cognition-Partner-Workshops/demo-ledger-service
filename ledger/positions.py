@@ -1,0 +1,53 @@
+"""Position aggregation from trade blotters."""
+
+from collections import defaultdict
+from dataclasses import dataclass
+from decimal import Decimal
+
+from ledger.models import Side
+
+
+@dataclass
+class Position:
+    account: str
+    symbol: str
+    quantity: Decimal
+    cost_basis: Decimal
+
+    @property
+    def average_cost(self):
+        if self.quantity == 0:
+            return Decimal("0")
+        return self.cost_basis / self.quantity
+
+
+def build_positions(trades):
+    books = defaultdict(lambda: {"quantity": Decimal("0"), "cost": Decimal("0")})
+    for trade in sorted(trades, key=lambda t: (t.trade_date, t.trade_id)):
+        book = books[(trade.account, trade.symbol)]
+        if trade.side is Side.BUY:
+            book["quantity"] += trade.quantity
+            book["cost"] += trade.notional
+        else:
+            if trade.quantity > book["quantity"]:
+                raise ValueError(
+                    f"{trade.trade_id}: sell of {trade.quantity} exceeds position {book['quantity']}"
+                )
+            avg = book["cost"] / book["quantity"] if book["quantity"] else Decimal("0")
+            book["quantity"] -= trade.quantity
+            book["cost"] -= avg * trade.quantity
+    return [
+        Position(account=acct, symbol=sym, quantity=b["quantity"], cost_basis=b["cost"])
+        for (acct, sym), b in sorted(books.items())
+    ]
+
+
+def gross_exposure(positions, prices):
+    total = Decimal("0")
+    for position in positions:
+        total += abs(position.quantity) * prices[position.symbol]
+    return total
+
+
+def positions_for_account(positions, account):
+    return [p for p in positions if p.account == account and p.quantity != 0]

@@ -1,0 +1,45 @@
+{
+  "invoices": [
+    {
+      "invoice_id": "INV-2026-0001",
+      "account": "ACC-1001",
+      "period_start": "2026-01-01",
+      "period_end": "2026-03-31",
+      "tax_rate": "0",
+      "lines": [
+        {"description": "Management fee Q1 2026", "notional": "1000000.00", "bps": "25", "amount": "2500.00"},
+        {"description": "Custody fee Q1 2026", "notional": "250000.00", "bps": "12.5", "amount": "312.50"}
+      ],
+      "subtotal": "2812.50",
+      "tax": "0.00",
+      "total": "2812.50"
+    },
+    {
+      "invoice_id": "INV-2026-0002",
+      "account": "ACC-2042",
+      "period_start": "2026-01-01",
+      "period_end": "2026-03-31",
+      "tax_rate": "0.125",
+      "lines": [
+        {"description": "Management fee Q1 2026", "notional": "12345.00", "bps": "25", "amount": "30.87"},
+        {"description": "Performance fee Q1 2026", "gain": "6173.025", "rate": "0.20", "amount": "1234.61"}
+      ],
+      "subtotal": "1265.48",
+      "tax": "158.19",
+      "total": "1423.67"
+    },
+    {
+      "invoice_id": "INV-2026-0003",
+      "account": "ACC-3310",
+      "period_start": "2026-01-01",
+      "period_end": "2026-03-31",
+      "tax_rate": "0",
+      "lines": [
+        {"description": "Management fee Q1 2026", "notional": "54321.00", "bps": "15", "amount": "81.49"}
+      ],
+      "subtotal": "81.49",
+      "tax": "0.00",
+      "total": "81.49"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+[project]
+name = "demo-ledger-service"
+version = "0.3.1"
+description = "Settlement, fee and position utilities for a small fund ledger"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
