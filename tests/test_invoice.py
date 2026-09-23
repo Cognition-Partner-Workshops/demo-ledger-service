@@ -3,14 +3,22 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
+
 from ledger.invoice import Invoice, render_invoice
 
 FIXTURES = Path(__file__).parent / "fixtures" / "invoices.json"
 
 
+def load_fixtures() -> list[dict]:
+    return json.loads(FIXTURES.read_text())["invoices"]
+
+
 def load_fixture(invoice_id: str) -> dict:
-    data = json.loads(FIXTURES.read_text())
-    return next(inv for inv in data["invoices"] if inv["invoice_id"] == invoice_id)
+    return next(inv for inv in load_fixtures() if inv["invoice_id"] == invoice_id)
+
+
+ALL_FIXTURE_IDS = [inv["invoice_id"] for inv in load_fixtures()]
 
 
 def build_invoice(fixture: dict) -> Invoice:
@@ -28,6 +36,16 @@ def build_invoice(fixture: dict) -> Invoice:
 
 def test_invoice_totals_match_fixture():
     fixture = load_fixture("INV-2026-0001")
+    invoice = build_invoice(fixture)
+    assert invoice.subtotal() == Decimal(fixture["subtotal"])
+    assert invoice.tax() == Decimal(fixture["tax"])
+    assert invoice.total() == Decimal(fixture["total"])
+
+
+@pytest.mark.parametrize("invoice_id", ALL_FIXTURE_IDS)
+def test_all_fixture_totals_round_half_up(invoice_id):
+    # INV-2026-0002 has tax 1265.48 * 0.125 = 158.185, which must round to 158.19.
+    fixture = load_fixture(invoice_id)
     invoice = build_invoice(fixture)
     assert invoice.subtotal() == Decimal(fixture["subtotal"])
     assert invoice.tax() == Decimal(fixture["tax"])
