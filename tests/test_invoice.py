@@ -3,6 +3,7 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
+from ledger.fees import management_fee, performance_fee
 from ledger.invoice import Invoice, render_invoice
 
 FIXTURES = Path(__file__).parent / "fixtures" / "invoices.json"
@@ -30,6 +31,25 @@ def test_invoice_totals_match_fixture():
     fixture = load_fixture("INV-2026-0001")
     invoice = build_invoice(fixture)
     assert invoice.subtotal() == Decimal(fixture["subtotal"])
+    assert invoice.tax() == Decimal(fixture["tax"])
+    assert invoice.total() == Decimal(fixture["total"])
+
+
+def test_invoice_with_tax_rounds_half_up():
+    fixture = load_fixture("INV-2026-0002")
+    invoice = Invoice(
+        invoice_id=fixture["invoice_id"],
+        account=fixture["account"],
+        period_start=date.fromisoformat(fixture["period_start"]),
+        period_end=date.fromisoformat(fixture["period_end"]),
+        tax_rate=Decimal(fixture["tax_rate"]),
+    )
+    mgmt, perf = fixture["lines"]
+    invoice.add_line(mgmt["description"], management_fee(Decimal(mgmt["notional"]), Decimal(mgmt["bps"])))
+    invoice.add_line(perf["description"], performance_fee(Decimal(perf["gain"]), Decimal(perf["rate"])))
+    assert [line.amount for line in invoice.lines] == [Decimal(mgmt["amount"]), Decimal(perf["amount"])]
+    assert invoice.subtotal() == Decimal(fixture["subtotal"])
+    # 1265.47 * 0.125 = 158.18375 -> 158.18
     assert invoice.tax() == Decimal(fixture["tax"])
     assert invoice.total() == Decimal(fixture["total"])
 
