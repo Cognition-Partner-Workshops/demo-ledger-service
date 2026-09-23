@@ -13,6 +13,17 @@ def test_management_fee_fractional_bps():
     assert management_fee(Decimal("250000"), Decimal("12.5")) == Decimal("312.50")
 
 
+def test_management_fee_rounds_up_to_cent():
+    # 12345 * 25bps = 30.8625; 54321 * 15bps = 81.4815. Fractions round away from zero.
+    assert management_fee(Decimal("12345"), Decimal("25")) == Decimal("30.87")
+    assert management_fee(Decimal("54321"), Decimal("15")) == Decimal("81.49")
+
+
+def test_performance_fee_rounds_up_to_cent():
+    # 6173.025 * 0.20 = 1234.605
+    assert performance_fee(Decimal("6173.025"), Decimal("0.20")) == Decimal("1234.61")
+
+
 def test_management_fee_rejects_negative_notional():
     with pytest.raises(ValueError):
         management_fee(Decimal("-1"), Decimal("25"))

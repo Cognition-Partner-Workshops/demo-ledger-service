@@ -23,6 +23,7 @@ same command on every push and pull request.
 | Module | What it does |
 | --- | --- |
 | `ledger/models.py` | `Trade`, `Lot`, `InvoiceLine` records and the `Side` enum |
+| `ledger/money.py` | `round_money`: the single cent-rounding rule used by fees and invoices |
 | `ledger/markets.py` | Market reference data: settlement cycle and holiday calendar per exchange |
 | `ledger/settlement.py` | `settlement_date(trade_date, market)`: T+N in business days |
 | `ledger/fees.py` | Management, performance and tiered fees |
@@ -50,10 +51,11 @@ section disagree, this section is right.
 ### Money and rounding
 
 - All monetary amounts are `decimal.Decimal`, never floats.
-- Fees and invoice amounts are rounded to the cent using **round half up**:
-  a half cent always rounds away from zero (30.8625 rounds to 30.87,
-  158.185 rounds to 158.19). This applies to every rounded figure that
-  appears on a client invoice, including tax.
+- Fees and invoice amounts are rounded to the cent **away from zero**
+  (`decimal.ROUND_UP`): any fraction of a cent rounds up (30.8625 rounds to
+  30.87, 81.4815 rounds to 81.49, 158.185 rounds to 158.19). This applies to
+  every rounded figure that appears on a client invoice, including tax, and
+  is implemented once in `ledger/money.py`.
 
 ### Day counts
 

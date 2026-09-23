@@ -3,14 +3,26 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
+
+from ledger.fees import management_fee, performance_fee
 from ledger.invoice import Invoice, render_invoice
 
 FIXTURES = Path(__file__).parent / "fixtures" / "invoices.json"
 
 
+def load_fixtures() -> list[dict]:
+    return json.loads(FIXTURES.read_text())["invoices"]
+
+
 def load_fixture(invoice_id: str) -> dict:
-    data = json.loads(FIXTURES.read_text())
-    return next(inv for inv in data["invoices"] if inv["invoice_id"] == invoice_id)
+    return next(inv for inv in load_fixtures() if inv["invoice_id"] == invoice_id)
+
+
+def fee_for_line(line: dict):
+    if "notional" in line:
+        return management_fee(Decimal(line["notional"]), Decimal(line["bps"]))
+    return performance_fee(Decimal(line["gain"]), Decimal(line["rate"]))
 
 
 def build_invoice(fixture: dict) -> Invoice:
@@ -26,12 +38,25 @@ def build_invoice(fixture: dict) -> Invoice:
     return invoice
 
 
-def test_invoice_totals_match_fixture():
-    fixture = load_fixture("INV-2026-0001")
+@pytest.mark.parametrize("fixture", load_fixtures(), ids=lambda f: f["invoice_id"])
+def test_invoice_totals_match_fixture(fixture):
     invoice = build_invoice(fixture)
     assert invoice.subtotal() == Decimal(fixture["subtotal"])
     assert invoice.tax() == Decimal(fixture["tax"])
     assert invoice.total() == Decimal(fixture["total"])
+
+
+@pytest.mark.parametrize("fixture", load_fixtures(), ids=lambda f: f["invoice_id"])
+def test_fee_lines_match_fixture(fixture):
+    for line in fixture["lines"]:
+        assert fee_for_line(line) == Decimal(line["amount"]), line["description"]
+
+
+def test_tax_rounds_to_cent():
+    invoice = build_invoice(load_fixture("INV-2026-0002"))
+    assert invoice.subtotal() * invoice.tax_rate == Decimal("158.18500")
+    assert invoice.tax() == Decimal("158.19")
+    assert invoice.total() == Decimal("1423.67")
 
 
 def test_render_invoice_layout():
