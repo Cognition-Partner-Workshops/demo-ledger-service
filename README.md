@@ -7,6 +7,25 @@ P&L. Pure Python, no I/O, no framework.
 > Sample repository owned by Cognition for demonstrations. It is not a
 > customer system and contains no customer data.
 
+## Installing as a dependency
+
+The package is built with setuptools (PEP 517) and ships the `ledger`
+package. It is not published to a registry; consumers pin a Git tag:
+
+```bash
+pip install "git+https://github.com/Cognition-Partner-Workshops/demo-ledger-service@v0.4.0"
+```
+
+With Poetry:
+
+```toml
+[tool.poetry.dependencies]
+demo-ledger-service = { git = "https://github.com/Cognition-Partner-Workshops/demo-ledger-service.git", tag = "v0.4.0" }
+```
+
+Known consumers in this organisation: `eventflow-order-service`
+(`ledger.settlement`) and `eventflow-payment-service` (`ledger.fees`).
+
 ## Running the tests
 
 ```bash
@@ -75,5 +94,6 @@ section disagree, this section is right.
 
 ## Versioning
 
-`ledger.__version__` is bumped on every release. Dependencies are pinned in
-`requirements.txt`.
+`ledger.__version__` and `version` in `pyproject.toml` are bumped together on
+every release, and the merge commit is tagged `vX.Y.Z` so consumers can pin
+it. Test dependencies are pinned in `requirements.txt`.

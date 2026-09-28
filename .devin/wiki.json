@@ -1,0 +1,38 @@
+{
+  "repo_notes": [
+    {
+      "content": "demo-ledger-service is a shared library, not a deployable service. It is consumed as a pinned Git-tag dependency by eventflow-order-service (ledger.settlement) and eventflow-payment-service (ledger.fees / ledger.invoice) in the same GitHub organisation. The README 'Accounting conventions' section is authoritative when code and documentation disagree."
+    }
+  ],
+  "pages": [
+    {
+      "title": "Overview",
+      "purpose": "What demo-ledger-service is: a pure-Python fund ledger library (settlement dates, fees, invoices, day counts, positions, realised P&L) with no I/O or framework, published as an installable package from a Git tag. Summarise the module table from the README and the accounting conventions that govern behaviour.",
+      "page_notes": [{ "content": "" }]
+    },
+    {
+      "title": "Installing and Releasing",
+      "purpose": "How the package is built (PEP 517, setuptools, the `ledger` package), how consumers install it from a pinned Git tag (pip and Poetry examples), and the release procedure: bump `version` in pyproject.toml and `ledger.__version__`, merge, then tag `vX.Y.Z`. Explain why the tag, not a registry, is the dependency mechanism.",
+      "parent": "Overview",
+      "page_notes": [{ "content": "" }]
+    },
+    {
+      "title": "Modules",
+      "purpose": "One section per module under ledger/: models, markets, settlement, fees, invoice, daycount, positions, pnl. For each, list the public functions/classes, their inputs and outputs, and the accounting rule from the README they implement (T+N business days, round-half-up money, 30/360 US rule, FIFO lot relief).",
+      "parent": "Overview",
+      "page_notes": [{ "content": "" }]
+    },
+    {
+      "title": "Consumers",
+      "purpose": "The 'Case 3' shared-library topology: which sibling repositories depend on this library, which module each one uses (order-service computes expected settlement dates via ledger.settlement.settlement_date; payment-service computes a processing-fee line via ledger.fees.management_fee), how they pin the tag in pyproject.toml, and what a consumer must do when a new tag is released.",
+      "parent": "Overview",
+      "page_notes": [{ "content": "" }]
+    },
+    {
+      "title": "Testing and CI",
+      "purpose": "The pytest suite layout (one test file per module, invoice fixtures in tests/fixtures/invoices.json), how to run it locally, and what .github/workflows/ci.yml runs on push and pull request.",
+      "parent": "Overview",
+      "page_notes": [{ "content": "" }]
+    }
+  ]
+}
