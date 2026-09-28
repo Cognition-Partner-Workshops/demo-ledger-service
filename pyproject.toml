@@ -1,8 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "demo-ledger-service"
-version = "0.3.1"
+version = "0.4.0"
 description = "Settlement, fee and position utilities for a small fund ledger"
+readme = "README.md"
 requires-python = ">=3.11"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Cognition-Partner-Workshops/demo-ledger-service"
+
+[tool.setuptools]
+packages = ["ledger"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

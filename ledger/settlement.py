@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from ledger.markets import Market, get_market, is_weekend
+from ledger.markets import Market, get_market, is_business_day
 
 
 def add_business_days(start: date, days: int, market: Market) -> date:
@@ -19,7 +19,7 @@ def add_business_days(start: date, days: int, market: Market) -> date:
     remaining = days
     while remaining > 0:
         current += timedelta(days=1)
-        if is_weekend(current):
+        if not is_business_day(current, market):
             continue
         remaining -= 1
     return current
