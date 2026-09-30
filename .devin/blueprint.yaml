@@ -1,0 +1,20 @@
+# https://docs.devin.ai/onboard-devin/environment-yaml
+# Commands run from the repo root.
+# One-time setup (e.g., install system tools, global CLIs).
+initialize: |
+  python3 -m venv .venv
+# Install project dependencies (runs during builds, surfaced to agent at session start).
+maintenance: |
+  .venv/bin/pip install -r requirements.txt
+  .venv/bin/pip install -e .
+# Reference info for agent
+knowledge:
+  - name: test
+    contents: |
+      .venv/bin/pytest -q
+  - name: release
+    contents: |
+      Bump version in both pyproject.toml and ledger/__init__.py (tests/test_package.py checks they match); after merge, tag vX.Y.Z on main. Consumers (eventflow-order-service, eventflow-payment-service) pin the tag via a Poetry git dependency; no registry publish.
+  - name: conventions
+    contents: |
+      README "Accounting conventions" section is authoritative; do not change settlement, fee, position or P&L semantics without updating it.
