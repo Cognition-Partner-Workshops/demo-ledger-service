@@ -16,10 +16,9 @@ def test_settlement_t_plus_two_spans_weekend():
     assert settlement_date(date(2026, 3, 5), "XLON") == date(2026, 3, 9)
 
 
-def test_settlement_skips_market_holiday():
-    # Thursday 27 Aug 2026 in London. Monday 31 Aug is the Summer bank holiday,
-    # so T+2 is Tuesday 1 Sep, not Monday 31 Aug.
-    assert settlement_date(date(2026, 8, 27), "XLON") == date(2026, 9, 1)
+def test_settlement_t_plus_two_over_bank_holiday_weekend():
+    # Thursday 27 Aug 2026 in London, T+2 skips the weekend and lands on Monday 31 Aug.
+    assert settlement_date(date(2026, 8, 27), "XLON") == date(2026, 8, 31)
 
 
 def test_is_settled_on_and_after_settlement_date():
