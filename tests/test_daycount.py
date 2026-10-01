@@ -23,6 +23,15 @@ def test_thirty_360_start_on_31st_to_february_end():
     assert day_count(date(2026, 1, 31), date(2026, 2, 28), DayCount.THIRTY_360) == 28
 
 
+def test_thirty_360_end_of_month_rule():
+    # US (Bond Basis): D1=31 -> 30; D2=31 -> 30 when D1 is 30 or 31.
+    assert day_count(date(2026, 1, 31), date(2026, 3, 31), DayCount.THIRTY_360) == 60
+    assert day_count(date(2026, 5, 31), date(2026, 8, 31), DayCount.THIRTY_360) == 90
+    assert day_count(date(2026, 1, 30), date(2026, 3, 31), DayCount.THIRTY_360) == 60
+    # D2=31 is kept when D1 is below 30.
+    assert day_count(date(2026, 1, 29), date(2026, 3, 31), DayCount.THIRTY_360) == 62
+
+
 def test_accrued_interest_act_360():
     # 1,000,000 at 3.6% for 90 days ACT/360 = 9,000.00
     assert accrued_interest(
