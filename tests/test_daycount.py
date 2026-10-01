@@ -23,6 +23,19 @@ def test_thirty_360_start_on_31st_to_february_end():
     assert day_count(date(2026, 1, 31), date(2026, 2, 28), DayCount.THIRTY_360) == 28
 
 
+@pytest.mark.parametrize(
+    "start, end, expected",
+    [
+        (date(2026, 1, 31), date(2026, 3, 31), 60),
+        (date(2026, 5, 31), date(2026, 8, 31), 90),
+        (date(2026, 1, 30), date(2026, 3, 31), 60),
+        (date(2026, 1, 15), date(2026, 3, 31), 76),
+    ],
+)
+def test_thirty_360_us_month_end_rule(start, end, expected):
+    assert day_count(start, end, DayCount.THIRTY_360) == expected
+
+
 def test_accrued_interest_act_360():
     # 1,000,000 at 3.6% for 90 days ACT/360 = 9,000.00
     assert accrued_interest(
