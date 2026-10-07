@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from ledger.fees import management_fee, performance_fee, tiered_management_fee
+from ledger.fees import custody_fee, management_fee, performance_fee, tiered_management_fee
 
 
 def test_management_fee_basic():
@@ -36,3 +36,31 @@ def test_tiered_management_fee_marginal_bands():
     ]
     # 1m @ 50bps = 5000, 4m @ 35bps = 14000, 1m @ 20bps = 2000
     assert tiered_management_fee(Decimal("6000000"), tiers) == Decimal("21000.00")
+
+
+def test_custody_fee_above_minimum():
+    # 2m @ 10bps = 2000, above the 500 minimum
+    assert custody_fee(Decimal("2000000"), Decimal("10"), minimum=Decimal("500")) == Decimal(
+        "2000.00"
+    )
+
+
+def test_custody_fee_floored_at_minimum():
+    # 100k @ 10bps = 100, below the 250 minimum
+    assert custody_fee(Decimal("100000"), Decimal("10"), minimum=Decimal("250")) == Decimal(
+        "250.00"
+    )
+
+
+def test_custody_fee_no_minimum():
+    assert custody_fee(Decimal("50000"), Decimal("8")) == Decimal("40.00")
+
+
+def test_custody_fee_rejects_negative_notional():
+    with pytest.raises(ValueError):
+        custody_fee(Decimal("-1"), Decimal("10"))
+
+
+def test_custody_fee_rejects_negative_minimum():
+    with pytest.raises(ValueError):
+        custody_fee(Decimal("1000"), Decimal("10"), minimum=Decimal("-1"))
