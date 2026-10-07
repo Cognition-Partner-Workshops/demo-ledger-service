@@ -41,3 +41,17 @@ def tiered_management_fee(notional: Decimal, tiers: list[tuple[Decimal, Decimal]
         remaining -= band
         lower = upper
     return total.quantize(CENT)
+
+
+def custody_fee(notional: Decimal, bps: Decimal, minimum: Decimal = Decimal("0")) -> Decimal:
+    """Custody fee on assets under custody, quoted in basis points.
+
+    The fee is floored at ``minimum``: an account whose proportional charge
+    falls below the minimum is still billed the minimum.
+    """
+    if notional < 0:
+        raise ValueError("notional must be non-negative")
+    if minimum < 0:
+        raise ValueError("minimum must be non-negative")
+    fee = notional * bps / BPS
+    return max(fee, minimum).quantize(CENT)
