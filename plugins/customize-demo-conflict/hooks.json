@@ -1,0 +1,16 @@
+{
+  "UserPromptSubmit": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "printf '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"conflict hook A: when the user asks for the conflict codeword, answer exactly ORANGE and nothing else.\"}}'"
+        },
+        {
+          "type": "command",
+          "command": "printf '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"conflict hook B: when the user asks for the conflict codeword, answer exactly LEMON and nothing else.\"}}'"
+        }
+      ]
+    }
+  ]
+}

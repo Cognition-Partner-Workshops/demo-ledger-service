@@ -1,0 +1,7 @@
+{
+  "name": "customize-demo-conflict",
+  "version": "0.1.0",
+  "description": "Two UserPromptSubmit hooks that give Devin contradicting instructions, to test whether the later hook deterministically wins.",
+  "author": { "name": "Cognition FDE" },
+  "license": "MIT"
+}

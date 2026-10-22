@@ -1,1 +1,1 @@
-{"requiredPlugins": ["./plugins/customize-demo"]}
+{"requiredPlugins": ["./plugins/customize-demo", "./plugins/customize-demo-conflict"]}
