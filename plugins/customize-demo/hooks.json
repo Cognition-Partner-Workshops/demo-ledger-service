@@ -1,0 +1,63 @@
+{
+  "UserPromptSubmit": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "printf '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"customize-demo UserPromptSubmit hook ran. If the user asks for the prompt codeword, answer exactly: SAPOTE.\"}}'"
+        }
+      ]
+    }
+  ],
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "printf '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"customize-demo SessionStart hook ran. If the user asks for the session-start codeword, answer exactly: FEIJOA.\"}}'"
+        }
+      ]
+    }
+  ],
+  "PreToolUse": [
+    {
+      "matcher": "^exec$",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "input=$(cat); if printf '%s' \"$input\" | grep -q 'BLOCKED_BY_HOOK'; then printf '{\"decision\":\"block\",\"reason\":\"customize-demo PreToolUse hook: commands mentioning BLOCKED_BY_HOOK are not allowed.\"}'; exit 2; fi; exit 0"
+        }
+      ]
+    },
+    {
+      "matcher": "^mcp__.*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo '[customize-demo] an MCP tool is about to run' >&2; exit 0"
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "edit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo '[customize-demo] a file was edited (this hook is silent on purpose)' >&2; exit 0"
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo '[customize-demo] Stop hook ran' >&2; exit 0"
+        }
+      ]
+    }
+  ]
+}
