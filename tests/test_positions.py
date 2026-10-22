@@ -4,7 +4,13 @@ from decimal import Decimal
 import pytest
 
 from ledger.models import Side, Trade
-from ledger.positions import build_positions, gross_exposure, positions_for_account
+from ledger.positions import (
+    Position,
+    build_positions,
+    gross_exposure,
+    net_exposure,
+    positions_for_account,
+)
 
 
 def trade(trade_id, side, qty, price, day, account="ACC-1001", symbol="ABC"):
@@ -67,3 +73,15 @@ def test_gross_exposure_and_account_filter():
     prices = {"X": Decimal("100"), "Y": Decimal("50"), "Z": Decimal("1")}
     assert gross_exposure(positions, prices) == Decimal("2000")
     assert [p.symbol for p in positions_for_account(positions, "B")] == ["Y"]
+
+
+def test_net_exposure_mixed_long_short_book():
+    positions = [
+        Position(account="A", symbol="X", quantity=Decimal("10"), cost_basis=Decimal("900")),
+        Position(account="A", symbol="Y", quantity=Decimal("-4"), cost_basis=Decimal("-200")),
+        Position(account="B", symbol="Z", quantity=Decimal("0"), cost_basis=Decimal("0")),
+    ]
+    prices = {"X": Decimal("100.50"), "Y": Decimal("50.25"), "Z": Decimal("7")}
+    assert net_exposure(positions, prices) == Decimal("804.00")
+    assert gross_exposure(positions, prices) == Decimal("1206.00")
+    assert net_exposure([], prices) == Decimal("0")

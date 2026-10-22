@@ -49,5 +49,18 @@ def gross_exposure(positions, prices):
     return total
 
 
+def net_exposure(positions, prices):
+    """Signed market value of the book: sum of quantity * price.
+
+    Long positions contribute positively and short (negative quantity)
+    positions negatively, so a hedged book nets towards zero while
+    ``gross_exposure`` keeps growing.
+    """
+    total = Decimal("0")
+    for position in positions:
+        total += position.quantity * prices[position.symbol]
+    return total
+
+
 def positions_for_account(positions, account):
     return [p for p in positions if p.account == account and p.quantity != 0]
