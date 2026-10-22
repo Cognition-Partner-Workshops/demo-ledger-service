@@ -1,0 +1,18 @@
+{
+  "name": "customize-demo",
+  "version": "0.1.0",
+  "description": "Hands-on demo of every Customize capability: always-on, glob and manual rules; auto vs @mention-only skills; PreToolUse/PostToolUse/UserPromptSubmit/SessionStart/Stop hooks; a plugin MCP server; a subagent; and governance fields.",
+  "author": { "name": "Cognition FDE", "email": "sumit.shatwara@cognition.ai" },
+  "license": "MIT",
+  "keywords": ["devin", "plugin", "demo", "hooks", "rules", "skills", "mcp"],
+  "optionalPlugins": [
+    {
+      "source": "git-subdir",
+      "url": "https://github.com/CognitionAI/plugin-template.git",
+      "path": "plugins/hello-world"
+    }
+  ],
+  "forbiddenPlugins": [
+    "sketchy-org/*"
+  ]
+}
